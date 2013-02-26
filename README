@@ -1,0 +1,7 @@
+These two small tools are for personal usage.
+
+amg_join.py can get the info like release date, rating, styles, and label of an album from AMG.
+
+get_tracks.py can get the song tracks of an album from AMG.
+
+ 

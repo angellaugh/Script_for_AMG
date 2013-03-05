@@ -7,11 +7,12 @@
 # 20110720    0.0.1      eric   
 # 20110725    0.0.2      eric   can use, a bug "ContemporaryR&B;"(first style).
 # 20110726    0.1.0      eric   solved ';' issue, solved no style issue.
-# 20110804    0.1.1      eric   solved label split; '&' in label.
+# 20110804    0.1.1      eric   solved the HTML entity codes conversion issue, use HTMLParser.
 # 20110828    0.1.2      eric   split '/' in label and remove space.
 # 20111227    0.1.3      eric   support multi '/' in label.
 # 20120529    0.2.0      eric   support new version of AMG.
 # 20120607    0.2.1      eric   get the 'CD' label.
+# 20130305    0.2.2      eric   solved the HTML entity codes conversion issue after update to new version of AMG.
 
 import urllib
 import string
@@ -62,7 +63,7 @@ def tag_from_amg(url):
     for album in find_result:
         if album.text == "CD":
             tmp = album.findNext('td').text
-            label_ori = tmp.replace(album.findNext('strong').text, "")
+            label_ori = h.unescape(tmp.replace(album.findNext('strong').text, ""))
             label = label_ori.replace(" ", "")
             lst.append(label)
             mul_label = label_ori.find('/')
@@ -72,4 +73,4 @@ def tag_from_amg(url):
             lst.append(album.findNext('strong').findNext('td').text)
     print ' '.join(lst)
 
-tag_from_amg('http://www.allmusic.com/album/rhymes-reasons-mw0000207709')
+tag_from_amg('http://www.allmusic.com/album/strength-in-numbers-mw0000192172')

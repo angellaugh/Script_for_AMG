@@ -13,6 +13,7 @@
 # 20120529    0.2.0      eric   support new version of AMG.
 # 20120607    0.2.1      eric   get the 'CD' label.
 # 20130305    0.2.2      eric   solved the HTML entity codes conversion issue after update to new version of AMG.
+# 20130310    0.2.3      eric   get "GENRE" info while no "STYLES" info. get the label infos of all the album format released.
 
 import urllib
 import string
@@ -55,22 +56,23 @@ def tag_from_amg(url):
             lst.append(tmp_str.replace(" ", ""))
             style = style.findNext('li')
             i += 1
+    else:
+        lst.append(parser.find('dd', 'genres').text.replace(" ", ""))
 
     # find label
     html_src = urllib.urlopen(url + '/releases').read()
     parser = BeautifulSoup(html_src, convertEntities=BeautifulSoup.HTML_ENTITIES)
     find_result = parser.findAll('td', 'format')
-    for album in find_result:
-        if album.text == "CD":
-            tmp = album.findNext('td').text
-            label_ori = h.unescape(tmp.replace(album.findNext('strong').text, ""))
-            label = label_ori.replace(" ", "")
-            lst.append(label)
-            mul_label = label_ori.find('/')
-            if mul_label != -1:
-                label_div = label.replace("/", " ")
-                lst.append(label_div)
-            lst.append(album.findNext('strong').findNext('td').text)
+    for album in find_result: #if album.text == "CD":
+        tmp = album.findNext('td').text
+        label_ori = h.unescape(tmp.replace(album.findNext('strong').text, ""))
+        label = label_ori.replace(" ", "")
+        lst.append(label)
+        mul_label = label_ori.find('/')
+        if mul_label != -1:
+            label_div = label.replace("/", " ")
+            lst.append(label_div)
+        lst.append(album.findNext('strong').findNext('td').text)
     print ' '.join(lst)
 
 tag_from_amg('http://www.allmusic.com/album/strength-in-numbers-mw0000192172')

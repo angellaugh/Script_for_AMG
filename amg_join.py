@@ -21,17 +21,15 @@ import HTMLParser
 from BeautifulSoup import BeautifulSoup
 
 def tag_from_amg(url):
-    # open the webpage and parse
+    # open and parse the webpage
     html_src = urllib.urlopen(url).read()
     parser = BeautifulSoup(html_src, convertEntities=BeautifulSoup.HTML_ENTITIES)
     h = HTMLParser.HTMLParser()
-    amg_str = ""
     star = u"星"
     half = u"半"
-    rate0_flag = 1
     lst = []
 
-    # find rating,release date
+    # find rating, release date
     rating_str = parser.find('span', 'hidden')
     if rating_str != None:
         rating = float(rating_str.text)
@@ -48,14 +46,10 @@ def tag_from_amg(url):
     # find style tags
     find_result = parser.findAll('dd', 'styles')
     if len(find_result) > 0:
-        style = find_result[0]
-        list_len = len(style.findAll('li'))
-        i = 0
-        while i < list_len:
-            tmp_str = h.unescape(style.findNext('li').text)
+        styles = find_result[0].findAll('li')
+        for style in styles:
+            tmp_str = h.unescape(style.text)
             lst.append(tmp_str.replace(" ", ""))
-            style = style.findNext('li')
-            i += 1
     else:
         lst.append(parser.find('dd', 'genres').text.replace(" ", ""))
 

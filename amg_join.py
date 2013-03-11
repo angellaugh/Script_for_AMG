@@ -14,6 +14,7 @@
 # 20120607    0.2.1      eric   get the 'CD' label.
 # 20130305    0.2.2      eric   solved the HTML entity codes conversion issue after update to new version of AMG.
 # 20130310    0.2.3      eric   get "GENRE" info while no "STYLES" info. get the label infos of all the album format released.
+# 20130311    0.2.4      eric   solved an issue while get album label, only need replace once to get substring.
 
 import urllib
 import string
@@ -59,12 +60,11 @@ def tag_from_amg(url):
     find_result = parser.findAll('td', 'format')
     for album in find_result: #if album.text == "CD":
         tmp = album.findNext('td').text
-        label_ori = h.unescape(tmp.replace(album.findNext('strong').text, ""))
-        label = label_ori.replace(" ", "")
-        lst.append(label)
+        label_ori = h.unescape(tmp.replace(album.findNext('strong').text, "", 1)).replace(" ", "")
+        lst.append(label_ori)
         mul_label = label_ori.find('/')
         if mul_label != -1:
-            label_div = label.replace("/", " ")
+            label_div = label_ori.replace("/", " ")
             lst.append(label_div)
         lst.append(album.findNext('strong').findNext('td').text)
     print ' '.join(lst)

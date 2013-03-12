@@ -15,6 +15,7 @@
 # 20130305    0.2.2      eric   solved the HTML entity codes conversion issue after update to new version of AMG.
 # 20130310    0.2.3      eric   get "GENRE" info while no "STYLES" info. get the label infos of all the album format released.
 # 20130311    0.2.4      eric   solved an issue while get album label, only need replace once to get substring.
+# 20130312    0.2.5      eric   do not append duplicated label info.
 
 import urllib
 import string
@@ -59,14 +60,16 @@ def tag_from_amg(url):
     parser = BeautifulSoup(html_src, convertEntities=BeautifulSoup.HTML_ENTITIES)
     find_result = parser.findAll('td', 'format')
     for album in find_result: #if album.text == "CD":
-        tmp = album.findNext('td').text
-        label_ori = h.unescape(tmp.replace(album.findNext('strong').text, "", 1)).replace(" ", "")
-        lst.append(label_ori)
+        label_lst = []
+        label_ori = h.unescape(album.findNext('td').text.replace(album.findNext('strong').text, "", 1)).replace(" ", "")
+        label_lst.append(label_ori)
         mul_label = label_ori.find('/')
         if mul_label != -1:
-            label_div = label_ori.replace("/", " ")
-            lst.append(label_div)
-        lst.append(album.findNext('strong').findNext('td').text)
+            label_lst.append(label_ori.replace("/", " "))
+        label_lst.append(album.findNext('strong').findNext('td').text)
+        tmp_str = ' '.join(label_lst)
+        if not tmp_str in lst:
+            lst.append(tmp_str)
     print ' '.join(lst)
 
 tag_from_amg('http://www.allmusic.com/album/strength-in-numbers-mw0000192172')

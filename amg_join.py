@@ -50,8 +50,7 @@ def tag_from_amg(url):
     if len(find_result) > 0:
         styles = find_result[0].findAll('li')
         for style in styles:
-            tmp_str = h.unescape(style.text)
-            lst.append(tmp_str.replace(" ", ""))
+            lst.append(h.unescape(style.text).replace(" ", ""))
     else:
         lst.append(parser.find('dd', 'genres').text.replace(" ", ""))
 

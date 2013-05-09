@@ -17,17 +17,20 @@ def get_tracks(url):
 
     i = 1
     discs = parser.find('div', {'id' : 'tracks'})
-    disc_table = discs.findAll('div', 'table-container')
-    if len(disc_table) > 0:
-        i = 1
-        for disc in disc_table:
-            print "disc " + str(i)
-            i += 1
-            tracks = disc.findAll('a', 'primary_link')
-            j = 1
-            for track in tracks:
-                print str(j) + ". " + track.text
-                j += 1
-            print
+    if discs != None:
+        disc_table = discs.findAll('div', 'table-container')
+        if len(disc_table) > 0:
+            i = 1
+            for disc in disc_table:
+                print "disc " + str(i)
+                i += 1
+                tracks = disc.findAll('a', 'primary_link')
+                j = 1
+                for track in tracks:
+                    print str(j) + ". " + track.text
+                    j += 1
+                print
+    else:
+        print "No track list."
 
 get_tracks('http://www.allmusic.com/album/rhymes-reasons-mw0000207709')

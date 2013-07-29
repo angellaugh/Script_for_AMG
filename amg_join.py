@@ -16,6 +16,7 @@
 # 20130310    0.2.3      eric   get "GENRE" info while no "STYLES" info. get the label infos of all the album format released.
 # 20130311    0.2.4      eric   solved an issue while get album label, only need replace once to get substring.
 # 20130312    0.2.5      eric   do not append duplicated label info.
+# 20130729    0.3.0      eric   patch for AMG upgrading, need to use Rovi API ASAP.
 
 import urllib
 import string

@@ -7,7 +7,7 @@
 # 20110826    0.0.1      eric   first version.
 # 20111011    0.1.0      eric   support multi discs.
 # 20130220    0.2.0      eric   not work for xiami, update for allmusic.
-# 20130729    0.3.0      eric   patch for AMG upgrading, need use Rovi API ASAP.
+# 20130729    0.3.0      eric   patch for AMG upgrading, need to use Rovi API ASAP.
 
 import urllib
 import string

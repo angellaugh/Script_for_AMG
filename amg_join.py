@@ -32,43 +32,43 @@ def tag_from_amg(url):
     lst = []
 
     # find rating, release date
-    rating_str = parser.find('span', 'hidden')
+    rating_str = parser.find('ul', 'ratings')
     if rating_str != None:
-        rating = float(rating_str.text)
-        if rating * 2 % 2:
-            lst.append(str(string.atoi(rating_str.text[:1])) + star + half)
+        tmp_rating = int(rating_str.findNext('div')['class'][-1:])
+        if tmp_rating == 0 or tmp_rating % 2:
+            lst.append(str(tmp_rating / 2 + tmp_rating % 2) + star)
         else:
-            lst.append(str(string.atoi(rating_str.text)) + star)
+            lst.append(str(tmp_rating / 2 + tmp_rating % 2) + star + half)
     else:
         lst.append("0" + star)
-    rel_date = parser.find('dd', 'release-date')
+    rel_date = parser.find('div', 'release-date')
     if rel_date != None:
         lst.append(rel_date.text[-4:])
 
     # find style tags
-    find_result = parser.findAll('dd', 'styles')
+    find_result = parser.findAll('div', 'styles')
     if len(find_result) > 0:
-        styles = find_result[0].findAll('li')
+        styles = find_result[0].findAll('a')
         for style in styles:
             lst.append(h.unescape(style.text).replace(" ", ""))
     else:
-        lst.append(parser.find('dd', 'genres').text.replace(" ", ""))
+        lst.append(parser.find('div', 'genres').text.replace(" ", ""))
 
     # find label
     html_src = urllib.urlopen(url + '/releases').read()
     parser = BeautifulSoup(html_src, convertEntities=BeautifulSoup.HTML_ENTITIES)
-    find_result = parser.findAll('td', 'format')
+    find_result = parser.findAll('div', 'label')
     for album in find_result: #if album.text == "CD":
         label_lst = []
-        label_ori = h.unescape(album.findNext('td').text.replace(album.findNext('strong').text, "", 1)).replace(" ", "")
+        label_ori = h.unescape(album.text).replace(" ", "")
         label_lst.append(label_ori)
         mul_label = label_ori.find('/')
         if mul_label != -1:
             label_lst.append(label_ori.replace("/", " "))
-        label_lst.append(album.findNext('strong').findNext('td').text)
+        #label_lst.append(album.findNext('strong').findNext('td').text)
         tmp_str = ' '.join(label_lst)
         if not tmp_str in lst:
             lst.append(tmp_str)
     print ' '.join(lst)
 
-tag_from_amg('http://www.allmusic.com/album/strength-in-numbers-mw0000192172')
+tag_from_amg('http://www.allmusic.com/album/dicks-picks-vol-17-boston-garden-9-25-91-mw0000088337')

@@ -17,6 +17,7 @@
 # 20130311    0.2.4      eric   solved an issue while get album label, only need replace once to get substring.
 # 20130312    0.2.5      eric   do not append duplicated label info.
 # 20130729    0.3.0      eric   patch for AMG upgrading, need to use Rovi API ASAP.
+# 20130803    0.3.1      eric   minor fix for genre, add year for label info.
 
 import urllib
 import string
@@ -53,7 +54,7 @@ def tag_from_amg(url):
         for style in styles:
             lst.append(h.unescape(style.text).replace(" ", ""))
     else:
-        lst.append(parser.find('div', 'genres').text.replace(" ", ""))
+        lst.append(parser.find('div', 'genre').findNext('div').text.replace(" ", ""))
 
     # find label
     html_src = urllib.urlopen(url + '/releases').read()
@@ -66,7 +67,7 @@ def tag_from_amg(url):
         mul_label = label_ori.find('/')
         if mul_label != -1:
             label_lst.append(label_ori.replace("/", " "))
-        #label_lst.append(album.findNext('strong').findNext('td').text)
+        label_lst.append(album.findNext('td', 'year').text)
         tmp_str = ' '.join(label_lst)
         if not tmp_str in lst:
             lst.append(tmp_str)

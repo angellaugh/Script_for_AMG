@@ -29,4 +29,4 @@ def get_tracks(url):
     else:
         print "No track list."
 
-get_tracks('http://www.allmusic.com/album/rhymes-reasons-mw0000207709')
+get_tracks('http://www.allmusic.com/album/blow-by-blow-wired-mw0001061008')

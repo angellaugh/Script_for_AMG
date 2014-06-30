@@ -18,6 +18,7 @@
 # 20130312    0.2.5      eric   do not append duplicated label info.
 # 20130729    0.3.0      eric   patch for AMG upgrading, need to use Rovi API ASAP.
 # 20130803    0.3.1      eric   minor fix for genre, add year for label info.
+# 20140630    0.3.2      eric   minof fix for multi genre.
 
 import urllib
 import string
@@ -54,7 +55,9 @@ def tag_from_amg(url):
         for style in styles:
             lst.append(h.unescape(style.text).replace(" ", ""))
     else:
-        lst.append(parser.find('div', 'genre').findNext('div').text.replace(" ", ""))
+        genres = parser.find('div', 'genre').findNext('div').findAll('a')
+        for genre in genres:
+            lst.append(genre.text.replace(" ", ""))
 
     # find label
     html_src = urllib.urlopen(url + '/releases').read()
@@ -73,4 +76,4 @@ def tag_from_amg(url):
             lst.append(tmp_str)
     print ' '.join(lst)
 
-tag_from_amg('http://www.allmusic.com/album/dicks-picks-vol-17-boston-garden-9-25-91-mw0000088337')
+tag_from_amg('http://www.allmusic.com/album/chameleon-mw0000790450')

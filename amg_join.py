@@ -19,16 +19,17 @@
 # 20130729    0.3.0      eric   patch for AMG upgrading, need to use Rovi API ASAP.
 # 20130803    0.3.1      eric   minor fix for genre, add year for label info.
 # 20140630    0.3.2      eric   minor fix for multi genre.
+# 20141205    0.4.0      eric   support BeautifulSoup4.
 
 import urllib
 import string
 import HTMLParser
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 def tag_from_amg(url):
     # open and parse the webpage
     html_src = urllib.urlopen(url).read()
-    parser = BeautifulSoup(html_src, convertEntities=BeautifulSoup.HTML_ENTITIES)
+    parser = BeautifulSoup(html_src)
     h = HTMLParser.HTMLParser()
     star = u"星"
     half = u"半"
@@ -37,7 +38,7 @@ def tag_from_amg(url):
     # find rating, release date
     rating_str = parser.find('ul', 'ratings')
     if rating_str != None:
-        tmp_rating = int(rating_str.findNext('div')['class'][-1:])
+        tmp_rating = int(rating_str.findNext('div')['class'][1][-1:])
         if tmp_rating == 0 or tmp_rating % 2:
             lst.append(str(tmp_rating / 2 + tmp_rating % 2) + star)
         else:
@@ -46,34 +47,34 @@ def tag_from_amg(url):
         lst.append("0" + star)
     rel_date = parser.find('div', 'release-date')
     if rel_date != None:
-        lst.append(rel_date.text[-4:])
+        lst.append(rel_date.text.strip()[-4:])
 
     # find style tags
     find_result = parser.findAll('div', 'styles')
     if len(find_result) > 0:
         styles = find_result[0].findAll('a')
         for style in styles:
-            lst.append(h.unescape(style.text).replace(" ", ""))
+            lst.append(h.unescape(style.text).replace(" ", "").strip())
     else:
         genres = parser.find('div', 'genre').findNext('div').findAll('a')
         for genre in genres:
-            lst.append(genre.text.replace(" ", ""))
+            lst.append(genre.text.replace(" ", "").strip())
 
     # find label
     html_src = urllib.urlopen(url + '/releases').read()
-    parser = BeautifulSoup(html_src, convertEntities=BeautifulSoup.HTML_ENTITIES)
+    parser = BeautifulSoup(html_src)
     find_result = parser.findAll('div', 'label')
     for album in find_result: #if album.text == "CD":
         label_lst = []
-        label_ori = h.unescape(album.text).replace(" ", "")
+        label_ori = h.unescape(album.text).replace(" ", "").strip()
         label_lst.append(label_ori)
         mul_label = label_ori.find('/')
         if mul_label != -1:
             label_lst.append(label_ori.replace("/", " "))
-        label_lst.append(album.findNext('td', 'year').text)
+        label_lst.append(album.findNext('td', 'year').text.strip())
         tmp_str = ' '.join(label_lst)
         if not tmp_str in lst:
             lst.append(tmp_str)
     print ' '.join(lst)
 
-tag_from_amg('http://www.allmusic.com/album/chameleon-mw0000790450')
+tag_from_amg('http://www.allmusic.com/album/rock-or-bust-mw0002762127')

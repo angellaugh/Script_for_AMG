@@ -19,16 +19,25 @@
 # 20130729    0.3.0      eric   patch for AMG upgrading, need to use Rovi API ASAP.
 # 20130803    0.3.1      eric   minor fix for genre, add year for label info.
 # 20140630    0.3.2      eric   minor fix for multi genre.
-# 20141205    0.4.0      eric   support BeautifulSoup4.
+# 20141205    0.4.0      eric   switch to BeautifulSoup4.
+# 20150717    0.4.1      eric   add request headers.
 
 import urllib
+import urllib2
 import string
 import HTMLParser
 from bs4 import BeautifulSoup
+import sys
 
 def tag_from_amg(url):
     # open and parse the webpage
-    html_src = urllib.urlopen(url).read()
+    HEADER = {
+        'User-Agent' : 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0',
+        'Referer' : ''
+    }
+    urlrequest = urllib2.Request(url, headers=HEADER)
+    html_src = urllib2.urlopen(urlrequest).read()
+    #html_src = urllib.urlopen(url).read()
     parser = BeautifulSoup(html_src)
     h = HTMLParser.HTMLParser()
     star = u"星"
@@ -61,7 +70,9 @@ def tag_from_amg(url):
             lst.append(genre.text.replace(" ", "").strip())
 
     # find label
-    html_src = urllib.urlopen(url + '/releases').read()
+    urlrequest = urllib2.Request(url + '/releases', headers=HEADER)
+    html_src = urllib2.urlopen(urlrequest).read()
+    #html_src = urllib.urlopen(url + '/releases').read()
     parser = BeautifulSoup(html_src)
     find_result = parser.findAll('div', 'label')
     for album in find_result: #if album.text == "CD":
@@ -77,4 +88,7 @@ def tag_from_amg(url):
             lst.append(tmp_str)
     print ' '.join(lst)
 
-tag_from_amg('http://www.allmusic.com/album/rock-or-bust-mw0002762127')
+if len(sys.argv) > 1:
+    tag_from_amg(sys.argv[1])
+else:
+    print "Please input the Album URL from AMG."

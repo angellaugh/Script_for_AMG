@@ -1,8 +1,6 @@
-﻿# python2.5.1
+﻿# python2.7.6
 # author : eric zhang
 # email  : ericnomail@gmail.com
-# twitter: @loveisbug
-#    http://weibo.com/loveisbug
 # date        version    PIC    comments
 # 20110720    0.0.1      eric   
 # 20110725    0.0.2      eric   can use, a bug "ContemporaryR&B;"(first style).
@@ -21,6 +19,7 @@
 # 20140630    0.3.2      eric   minor fix for multi genre.
 # 20141205    0.4.0      eric   switch to BeautifulSoup4.
 # 20150717    0.4.1      eric   add request headers.
+# 20160114    0.5.0      eric   update for AMG updating(Releases page)
 
 import urllib
 import urllib2
@@ -38,7 +37,7 @@ def tag_from_amg(url):
     urlrequest = urllib2.Request(url, headers=HEADER)
     html_src = urllib2.urlopen(urlrequest).read()
     #html_src = urllib.urlopen(url).read()
-    parser = BeautifulSoup(html_src)
+    parser = BeautifulSoup(html_src, "html.parser")
     h = HTMLParser.HTMLParser()
     star = u"星"
     half = u"半"
@@ -73,16 +72,18 @@ def tag_from_amg(url):
     urlrequest = urllib2.Request(url + '/releases', headers=HEADER)
     html_src = urllib2.urlopen(urlrequest).read()
     #html_src = urllib.urlopen(url + '/releases').read()
-    parser = BeautifulSoup(html_src)
-    find_result = parser.findAll('div', 'label')
+    parser = BeautifulSoup(html_src, "html.parser")
+    find_result = parser.findAll('td', 'year')
     for album in find_result: #if album.text == "CD":
+        album_year = album.text.strip()
+        album_label = album.findNext('td', 'label-catalog')['data-sort-value']
         label_lst = []
-        label_ori = h.unescape(album.text).replace(" ", "").strip()
+        label_ori = h.unescape(album_label).replace(" ", "")
         label_lst.append(label_ori)
         mul_label = label_ori.find('/')
         if mul_label != -1:
             label_lst.append(label_ori.replace("/", " "))
-        label_lst.append(album.findNext('td', 'year').text.strip())
+        label_lst.append(album_year)
         tmp_str = ' '.join(label_lst)
         if not tmp_str in lst:
             lst.append(tmp_str)

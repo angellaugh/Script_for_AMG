@@ -19,7 +19,7 @@
 # 20140630    0.3.2      eric   minor fix for multi genre.
 # 20141205    0.4.0      eric   switch to BeautifulSoup4.
 # 20150717    0.4.1      eric   add request headers.
-# 20160114    0.5.0      eric   update for AMG updating(Releases page)
+# 20160121    0.5.1      eric   update for AMG updating(Releases page)
 
 import urllib
 import urllib2
@@ -73,17 +73,22 @@ def tag_from_amg(url):
     html_src = urllib2.urlopen(urlrequest).read()
     #html_src = urllib.urlopen(url + '/releases').read()
     parser = BeautifulSoup(html_src, "html.parser")
-    find_result = parser.findAll('td', 'year')
-    for album in find_result: #if album.text == "CD":
-        album_year = album.text.strip()
-        album_label = album.findNext('td', 'label-catalog')['data-sort-value']
+    release_sec = parser.findAll('section', 'releases')[0]
+    newpage = False
+    if release_sec.find('table', 'fdata'):
+        newpage = True
+    find_result = release_sec.find('tbody').findAll('tr')
+    for item in find_result:
+        label_year = item.findNext('td', 'year').text.strip()
+        if newpage:
+            label_label = item.findNext('td', 'label-catalog')['data-sort-value']
+        else:
+            label_label = item.findNext('div', 'label').text.strip()
         label_lst = []
-        label_ori = h.unescape(album_label).replace(" ", "")
-        label_lst.append(label_ori)
-        mul_label = label_ori.find('/')
-        if mul_label != -1:
-            label_lst.append(label_ori.replace("/", " "))
-        label_lst.append(album_year)
+        label_lst.append(label_year)
+        label_ori = h.unescape(label_label).split(' / ')
+        for label in label_ori:
+            label_lst.append(label.replace(' ', ''))
         tmp_str = ' '.join(label_lst)
         if not tmp_str in lst:
             lst.append(tmp_str)
